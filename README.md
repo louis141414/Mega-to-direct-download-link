@@ -23,7 +23,27 @@ It also tests your connection speed and estimates download time.
 
 ## Files
 
-- `index.html` – Everything (HTML + CSS + JavaScript) in one file
+- `index.html` – Frontend interface
+- `style.css` – Responsive styling
+- `script.js` – Link validation and download flow
+- `api/direct-download.js` – Serverless API for Mega and pCloud redirects
+- `api/server.js` – Local Node.js server for the frontend and API
+
+## Run Locally
+
+Use Node.js 18 or newer, then run:
+
+```bash
+node api/server.js
+```
+
+Open `http://localhost:8000`. The API accepts both providers through the same route:
+
+```text
+/api/direct-download?link=<public-link>
+```
+
+The `api/direct-download.js` handler can also be deployed as a serverless function. GitHub Pages can host the frontend, but it cannot execute the API folder itself; deploy the API separately and point `DIRECT_DOWNLOAD_API` in `script.js` to that API host when needed.
 
 ## Technical Notes
 
