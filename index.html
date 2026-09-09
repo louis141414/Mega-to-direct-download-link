@@ -1,102 +1,45 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html>
+  <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Mega Link Generator</title>
-
-    <link rel="stylesheet" href="style.css">
-</head>
-
-<body>
-
-    <main class="container">
-
-        <div class="card">
-
-            <h1>Mega Link Generator</h1>
-            <p class="description">
-                Generate and decode Mega download links.
-            </p>
-
-            <div class="mode-buttons">
-                <button id="megaMode" class="mode active">
-                    Mega → Direct
-                </button>
-
-                <button id="directMode" class="mode">
-                    Direct → Mega
-                </button>
-            </div>
-
-            <label for="urlInput">Mega URL</label>
-
-            <input
-                id="urlInput"
-                type="text"
-                placeholder="https://mega.nz/file/..."
-                autocomplete="off"
-            >
-
-            <div class="buttons">
-
-                <button id="generateBtn" class="primary">
-                    Generate
-                </button>
-
-                <button id="copyBtn">
-                    Copy
-                </button>
-
-                <button id="testBtn">
-                    Test
-                </button>
-
-                <button id="downloadBtn" class="download">
-                    Download
-                </button>
-
-            </div>
-
-            <div id="status" class="status"></div>
-
-            <div id="result" class="result hidden">
-
-                <div class="result-row">
-                    <span>File name</span>
-                    <strong id="fileName">Unknown</strong>
-                </div>
-
-                <div class="result-row">
-                    <span>File size</span>
-                    <strong id="fileSize">Unknown</strong>
-                </div>
-
-                <div class="result-row">
-                    <span>Download URL</span>
-                    <input
-                        id="resultUrl"
-                        type="text"
-                        readonly
-                    >
-                </div>
-
-                <div class="estimates">
-
-                    <h2>Estimated download time</h2>
-
-                    <div id="estimatesList"></div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </main>
-
-    <script src="script.js"></script>
-
-</body>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Mega Direct Download</title>
+    <link rel="stylesheet" href="styles.css"
+  </head>
+  <body>
+    <div class="box">
+      <h2>Mega Direct Download</h2>
+      <div class="input-row">
+        <input id="megaUrl" type="url" placeholder="https://mega.nz/file/...">
+        <button onclick="getFileInfo()">Generate</button>
+      </div>
+      <div id="speedStatus"></div>
+      <div id="loading">Loading...</div>
+      <div id="error"></div>
+    </div>
+    <div id="results" class="box results">
+      <div class="info-row">
+        <span class="label">Name:</span>
+        <span id="fileName" class="value"></span>
+      </div>
+      <div class="info-row">
+        <span class="label">Size:</span>
+        <span id="fileSize" class="value"></span>
+      </div>
+      <div class="info-row">
+        <span class="label">Your Speed:</span>
+        <span id="userSpeed" class="value"></span>
+      </div>
+      <div class="info-row">
+        <span class="label">Download Time:</span>
+        <span id="downloadTime" class="value"></span>
+      </div>
+      <button class="btn-download" onclick="downloadFile()">Download Now</button>
+      <div class="link-container">
+        <input id="directLink" type="text" readonly class="link-input">
+        <button class="copy-btn" onclick="copyLink()">Copy</button>
+      </div>
+    </div>
+	<script src="script.js"></script>
+  </body>
 </html>
