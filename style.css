@@ -1,131 +1,131 @@
 body {
-        font-family: Arial, sans-serif;
-        background: #111;
-        color: #eee;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-        margin: 0;
-        padding: 20px
-      }
+  font-family: Arial, sans-serif;
+  background: #111;
+  color: #eee;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  margin: 0;
+  padding: 20px;
+}
 
-      .box {
-        background: #222;
-        border: 1px solid #444;
-        padding: 20px;
-        width: 100%;
-        max-width: 400px
-      }
+.box {
+  background: #222;
+  border: 1px solid #444;
+  padding: 20px;
+  width: 100%;
+  max-width: 400px;
+}
 
-      h2 {
-        margin: 0 0 20px;
-        color: #eee;
-        font-size: 18px;
-        text-align: center
-      }
+h2 {
+  margin: 0 0 20px;
+  color: #eee;
+  font-size: 18px;
+  text-align: center;
+}
 
-      .input-row {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 10px
-      }
+.input-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
 
-      input[type="url"] {
-        flex: 1;
-        background: #111;
-        border: 1px solid #444;
-        color: #eee;
-        padding: 10px;
-        font-size: 14px
-      }
+input[type="url"] {
+  flex: 1;
+  background: #111;
+  border: 1px solid #444;
+  color: #eee;
+  padding: 10px;
+  font-size: 14px;
+}
 
-      input:focus {
-        outline: none;
-        border-color: #666
-      }
+input:focus {
+  outline: none;
+  border-color: #666;
+}
 
-      button {
-        background: #333;
-        border: 1px solid #444;
-        color: #eee;
-        padding: 10px 15px;
-        cursor: pointer;
-        font-size: 14px
-      }
+button {
+  background: #333;
+  border: 1px solid #444;
+  color: #eee;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 14px;
+}
 
-      button:hover {
-        background: #444
-      }
+button:hover {
+  background: #444;
+}
 
-      button:disabled {
-        opacity: .6;
-        cursor: not-allowed
-      }
+button:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
 
-      .btn-download {
-        background: #008000;
-        border: 1px solid #006600;
-        width: 100%;
-        padding: 12px;
-        margin-top: 10px
-      }
+.btn-download {
+  background: #008000;
+  border: 1px solid #006600;
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+}
 
-      .btn-download:hover {
-        background: #006600
-      }
+.btn-download:hover {
+  background: #006600;
+}
 
-      .results {
-        display: none
-      }
+.results {
+  display: none;
+}
 
-      .info-row {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 8px;
-        font-size: 14px
-      }
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
 
-      .label {
-        color: #888
-      }
+.label {
+  color: #888;
+}
 
-      .value {
-        color: #eee;
-        text-align: right
-      }
+.value {
+  color: #eee;
+  text-align: right;
+}
 
-      .link-container {
-        display: flex;
-        gap: 10px;
-        margin-top: 15px
-      }
+.link-container {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
 
-      .link-input {
-        flex: 1;
-        font-family: monospace;
-        font-size: 12px;
-        background: #111;
-        border: 1px solid #444;
-        color: #eee;
-        padding: 8px
-      }
+.link-input {
+  flex: 1;
+  font-family: monospace;
+  font-size: 12px;
+  background: #111;
+  border: 1px solid #444;
+  color: #eee;
+  padding: 8px;
+}
 
-      .copy-btn {
-        padding: 8px 12px
-      }
+.copy-btn {
+  padding: 8px 12px;
+}
 
-      #loading,
-      #error,
-      #speedStatus {
-        display: none;
-        color: #888;
-        font-size: 14px;
-        margin: 10px 0;
-        text-align: center
-      }
+#loading,
+#error,
+#speedStatus {
+  display: none;
+  color: #888;
+  font-size: 14px;
+  margin: 10px 0;
+  text-align: center;
+}
 
-      #error {
-        color: #f88
-      }
+#error {
+  color: #f88;
+}
