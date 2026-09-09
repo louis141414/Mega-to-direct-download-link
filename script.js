@@ -1,379 +1,154 @@
-```javascript
-/*
-    Change this to your API address.
-
-    Local:
-    http://localhost:3000
-
-    Example production:
-    https://api.example.com
-*/
-
-const API_URL = "http://localhost:3000";
-
-
-let currentMode = "mega";
-
-
-const urlInput = document.getElementById("urlInput");
-
-const megaMode = document.getElementById("megaMode");
-const directMode = document.getElementById("directMode");
-
-const generateBtn = document.getElementById("generateBtn");
-const copyBtn = document.getElementById("copyBtn");
-const testBtn = document.getElementById("testBtn");
-const downloadBtn = document.getElementById("downloadBtn");
-
-const status = document.getElementById("status");
-
-const result = document.getElementById("result");
-
-const fileName = document.getElementById("fileName");
-const fileSize = document.getElementById("fileSize");
-
-const resultUrl = document.getElementById("resultUrl");
-const estimatesList = document.getElementById("estimatesList");
-
-
-function setStatus(message) {
-    status.textContent = message;
-}
-
-
-function formatBytes(bytes) {
-
-    if (!bytes || bytes <= 0) {
-        return "Unknown";
-    }
-
-    const units = [
-        "B",
-        "KB",
-        "MB",
-        "GB",
-        "TB"
-    ];
-
-    let index = 0;
-    let value = bytes;
-
-    while (value >= 1024 && index < units.length - 1) {
-        value /= 1024;
-        index++;
-    }
-
-    return `${value.toFixed(index === 0 ? 0 : 2)} ${units[index]}`;
-}
-
-
-function formatTime(seconds) {
-
-    if (!Number.isFinite(seconds)) {
-        return "Unknown";
-    }
-
-    if (seconds < 60) {
-        return `${Math.ceil(seconds)} sec`;
-    }
-
-    const minutes = Math.floor(seconds / 60);
-
-    if (minutes < 60) {
-        return `${minutes} min`;
-    }
-
-    const hours = Math.floor(minutes / 60);
-    const remainingMinutes = minutes % 60;
-
-    return `${hours}h ${remainingMinutes}m`;
-}
-
-
-function showEstimates(size) {
-
-    estimatesList.innerHTML = "";
-
-    if (!size || size <= 0) {
-        estimatesList.innerHTML =
-            '<div class="estimate"><span>File size unavailable</span><span>—</span></div>';
-
-        return;
-    }
-
-    const speeds = [
-        {
-            name: "10 Mbps",
-            mbps: 10
-        },
-        {
-            name: "25 Mbps",
-            mbps: 25
-        },
-        {
-            name: "50 Mbps",
-            mbps: 50
-        },
-        {
-            name: "100 Mbps",
-            mbps: 100
-        },
-        {
-            name: "500 Mbps",
-            mbps: 500
-        },
-        {
-            name: "1 Gbps",
-            mbps: 1000
-        }
-    ];
-
-    for (const speed of speeds) {
-
-        const bytesPerSecond =
-            (speed.mbps * 1000 * 1000) / 8;
-
-        const seconds =
-            size / bytesPerSecond;
-
-        const row = document.createElement("div");
-
-        row.className = "estimate";
-
-        row.innerHTML = `
-            <span>${speed.name}</span>
-            <span>${formatTime(seconds)}</span>
-        `;
-
-        estimatesList.appendChild(row);
-    }
-}
-
-
-async function generate() {
-
-    const value = urlInput.value.trim();
-
-    if (!value) {
-        setStatus("Enter a URL first");
-        return;
-    }
-
-    setStatus("Working...");
-    result.classList.add("hidden");
-
+const API = 'https://mega.wldbs.workers.dev/api/info';
+let directLink = '',
+    fileSizeBytes = 0,
+    currentSpeed = 300;
+async function getFileInfo() {
+    const url = document.getElementById('megaUrl').value.trim();
+    if (!url) return showError('Enter URL');
+    if (!url.startsWith('https://mega.nz/file/')) return showError('Invalid Mega URL');
+    hideError();
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('speedStatus').style.display = 'none';
+    document.getElementById('results').style.display = 'none';
+    const statusEl = document.getElementById('speedStatus');
+    statusEl.style.display = 'block';
+    statusEl.textContent = 'Testing speed...';
     try {
-
-        if (currentMode === "direct") {
-
-            const response = await fetch(
-                `${API_URL}/api/decode`,
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-
-                    body: JSON.stringify({
-                        url: value
-                    })
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok || !data.success) {
-                throw new Error(
-                    data.error || "Could not decode URL"
-                );
-            }
-
-            urlInput.value = data.url;
-
-            setStatus("Mega URL decoded");
-
-            return;
+        currentSpeed = await testLibreSpeed(statusEl);
+        const fd = new FormData();
+        fd.append('megaurl', url);
+        const res = await fetch(API, {
+            method: 'POST',
+            body: fd
+        });
+        const data = await res.json();
+        if (data.ok) {
+            showResults(data, url)
+        } else {
+            showError(data.error || 'Failed')
         }
-
-
-        const response = await fetch(
-            `${API_URL}/api/mega`,
-            {
-                method: "POST",
-
-                headers: {
-                    "Content-Type": "application/json"
-                },
-
-                body: JSON.stringify({
-                    url: value
-                })
-            }
-        );
-
-
-        const data = await response.json();
-
-
-        if (!response.ok || !data.success) {
-            throw new Error(
-                data.error || "Could not generate link"
-            );
-        }
-
-
-        fileName.textContent =
-            data.filename || "Unknown";
-
-        fileSize.textContent =
-            formatBytes(data.size);
-
-        resultUrl.value =
-            data.url;
-
-        showEstimates(data.size);
-
-        result.classList.remove("hidden");
-
-        setStatus("Link generated");
-
-    } catch (error) {
-
-        setStatus(error.message);
-
+    } catch (e) {
+        showError('Error: ' + e.message)
+    } finally {
+        document.getElementById('loading').style.display = 'none'
     }
 }
-
-
-async function copyResult() {
-
-    if (!resultUrl.value) {
-        setStatus("Generate a link first");
-        return;
-    }
-
-    await navigator.clipboard.writeText(
-        resultUrl.value
-    );
-
-    setStatus("Copied");
-}
-
-
-async function testLink() {
-
-    if (!resultUrl.value) {
-        setStatus("Generate a link first");
-        return;
-    }
-
-    setStatus("Testing link...");
-
+async function testLibreSpeed(statusEl) {
     try {
-
-        const response = await fetch(
-            `${API_URL}/api/test?url=${encodeURIComponent(resultUrl.value)}`
-        );
-
-        const data = await response.json();
-
-        if (!response.ok || !data.success) {
-            throw new Error(
-                data.error || "Link test failed"
-            );
+        await fetch('https://librespeed.org/backend/getIP.php?json=true');
+        const testSize = 2000000;
+        const startTime = Date.now();
+        const requests = [];
+        for (let i = 0; i < 3; i++) {
+            requests.push(fetch('https://librespeed.org/backend/garbage.php?ckSize=' + testSize + '&t=' + Date.now() + i, {
+                cache: 'no-store'
+            }).catch(() => ({})))
         }
-
-        setStatus(
-            `Link works — ${data.status}`
-        );
-
-    } catch (error) {
-
-        setStatus(
-            `Test failed: ${error.message}`
-        );
     }
-}
-
-
-function download() {
-
-    if (!resultUrl.value) {
-        setStatus("Generate a link first");
-        return;
-    }
-
-    window.location.href =
-        resultUrl.value;
-}
-
-
-function setMode(mode) {
-
-    currentMode = mode;
-
-    if (mode === "mega") {
-
-        megaMode.classList.add("active");
-        directMode.classList.remove("active");
-
-        urlInput.placeholder =
-            "https://mega.nz/file/...";
-
+    await Promise.all(requests);
+    const endTime = Date.now();
+    const timeSec = (endTime - startTime) / 1000;
+    const mbps = (48 / timeSec).toFixed(1);
+    if (mbps > 10) {
+        statusEl.textContent = 'Speed: ' + mbps + ' Mbps';
+        return parseFloat(mbps)
     } else {
-
-        directMode.classList.add("active");
-        megaMode.classList.remove("active");
-
-        urlInput.placeholder =
-            "https://mega.wldbs.workers.dev/download?url=...";
-
+        return await fetchSpeedTest(statusEl)
     }
-
-    result.classList.add("hidden");
-    setStatus("");
+} catch (e) {
+    return await fetchSpeedTest(statusEl)
+}
+}
+async function fetchSpeedTest(statusEl) {
+    statusEl.textContent = 'Testing speed (fallback)...';
+    const testFiles = [{
+        url: 'https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js',
+        size: 70000
+    }, {
+        url: 'https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js',
+        size: 45000
+    }, {
+        url: 'https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.min.js',
+        size: 350000
+    }, {
+        url: 'https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js',
+        size: 30000
+    }];
+    const filesWithCacheBuster = testFiles.map(f => ({
+        ...f,
+        url: f.url + '?v=' + Date.now() + Math.random().toString(36).substr(2, 5)
+    }));
+    const startTime = Date.now();
+    await Promise.all(filesWithCacheBuster.map(f => fetch(f.url, {
+        cache: 'no-store'
+    }).catch(() => ({}))));
+    const endTime = Date.now();
+    const timeSec = (endTime - startTime) / 1000;
+    const totalSizeBytes = filesWithCacheBuster.reduce((sum, f) => sum + f.size, 0);
+    const mbps = (totalSizeBytes * 8 / timeSec / 1000000).toFixed(1);
+    statusEl.textContent = 'Speed: ' + mbps + ' Mbps';
+    return parseFloat(mbps)
 }
 
+function showResults(data, url) {
+    document.getElementById('fileName').textContent = data.file_name || 'Unknown';
+    document.getElementById('fileSize').textContent = formatBytes(data.file_size || 0);
+    fileSizeBytes = data.file_size || 0;
+    directLink = 'https://mega.wldbs.workers.dev/download?url=' + btoa(url);
+    document.getElementById('directLink').value = directLink;
+    document.getElementById('userSpeed').textContent = currentSpeed.toFixed(1) + ' Mbps';
+    document.getElementById('results').style.display = 'block';
+    updateDownloadTime()
+}
 
-megaMode.addEventListener(
-    "click",
-    () => setMode("mega")
-);
+function updateDownloadTime() {
+    if (fileSizeBytes === 0) return;
+    const timeSec = (fileSizeBytes * 8) / (currentSpeed * 1000000);
+    document.getElementById('downloadTime').textContent = formatTime(timeSec)
+}
 
-directMode.addEventListener(
-    "click",
-    () => setMode("direct")
-);
+function formatBytes(b) {
+    if (b === 0) return '0B';
+    const k = 1024,
+        sizes = ['B', 'KB', 'MB', 'GB', 'TB'],
+        i = Math.floor(Math.log(b) / Math.log(k));
+    return (b / Math.pow(k, i)).toFixed(2) + ' ' + sizes[i]
+}
 
-generateBtn.addEventListener(
-    "click",
-    generate
-);
+function formatTime(s) {
+    if (s < 60) return '~' + Math.round(s) + 's';
+    const mins = Math.floor(s / 60),
+        secs = Math.round(s % 60);
+    if (mins < 60) return '~' + mins + 'm ' + secs + 's';
+    const hours = Math.floor(s / 3600),
+        remainingMins = Math.round((s % 3600) / 60);
+    return '~' + hours + 'h ' + remainingMins + 'm'
+}
 
-copyBtn.addEventListener(
-    "click",
-    copyResult
-);
+function downloadFile() {
+    if (directLink) window.location.href = directLink
+}
 
-testBtn.addEventListener(
-    "click",
-    testLink
-);
+function copyLink() {
+    const i = document.getElementById('directLink');
+    i.select();
+    document.execCommand('copy');
+    const b = event.target;
+    b.textContent = 'Copied!';
+    setTimeout(() => {
+        b.textContent = 'Copy'
+    }, 1500)
+}
 
-downloadBtn.addEventListener(
-    "click",
-    download
-);
+function showError(m) {
+    const e = document.getElementById('error');
+    e.textContent = m;
+    e.style.display = 'block'
+}
 
-urlInput.addEventListener(
-    "keydown",
-    event => {
-
-        if (event.key === "Enter") {
-            generate();
-        }
-
-    }
-);
-```
+function hideError() {
+    document.getElementById('error').style.display = 'none'
+}
+document.getElementById('megaUrl').addEventListener('keypress', e => {
+    if (e.key === 'Enter') getFileInfo()
+});
